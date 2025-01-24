@@ -1,0 +1,83 @@
+.cardContainer {
+    border-radius: 16px;
+    background: #fff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    overflow: hidden;
+    position: relative;
+    margin: 20px;
+}
+
+.cardContainer:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+}
+
+.service-card-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+}
+
+.service-image-container {
+    width: 100%;
+    height: 250px; /* Increased height to make the image more visible */
+    overflow: hidden;
+    border-radius: 12px;
+}
+
+.service-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.service-image-container:hover .service-image {
+    transform: scale(1.05);
+}
+
+.service-info {
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.service-name {
+    font-size: 20px;
+    font-weight: bold;
+    color: #333;
+    margin: 0;
+}
+
+.service-user_role {
+    font-size: 14px;
+    color: #555;
+    margin-top: 5px;
+}
+
+.service-price {
+    font-size: 18px;
+    font-weight: bold;
+    color: #fd4518;
+    margin-top: 10px;
+}
+
+.send-message-button {
+    background-color: #ffeee8;
+    color: #fd4518;
+    height: 40px;
+    border-radius: 10px;
+    border: none;
+    padding: 0 1.5rem;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+    margin-top: 20px;
+}
+
+.send-message-button:hover {
+    background-color: #fd4518;
+    color: #fff;
+}
