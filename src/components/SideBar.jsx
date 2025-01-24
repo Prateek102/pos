@@ -32,9 +32,6 @@ const SideBar = ({ visible, onClose, isMobileWidth, tabletVisible }) => {
         if (key === "1") {
             navigate("/");
         }
-        if (key === "2") {
-            navigate("/checkout");
-        }
     };
 
     const menuItems = [

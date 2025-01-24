@@ -1,12 +1,13 @@
-import React from "react";
+import React, { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { Card, Button, Divider, Typography } from "antd";
+import { Card, Button, Divider, Typography, Modal, Input, Form } from "antd";
 import { MinusOutlined, PlusOutlined, DeleteOutlined } from "@ant-design/icons";
 import {
     removeFromCart,
     increaseQuantity,
     decreaseQuantity,
 } from "../hooks/cartReducer";
+import "./css/cart.css";
 
 const { Title, Text } = Typography;
 
@@ -14,13 +15,19 @@ export default function Cart() {
     const dispatch = useDispatch();
     const cartItems = useSelector((state) => state.cart.cartItems);
 
+    // Calculate values based on cart items
     const subtotal = cartItems.reduce(
         (sum, item) => sum + item.price * item.quantity,
         0
     );
-    const discount = 5.0;
-    const tax = (subtotal - discount) * 0.06; 
-    const total = subtotal - discount + tax;
+    const discount = cartItems.length > 0 ? 250.0 : 0; // Set to 0 if cart is empty
+    const tax = cartItems.length > 0 ? (subtotal - discount) * 0.06 : 0; // Set to 0 if cart is empty
+    const total = cartItems.length > 0 ? subtotal - discount + tax : 0; // Set to 0 if cart is empty
+
+    const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
+    const [isInvoiceModalOpen, setIsInvoiceModalOpen] = useState(false);
+    const [formData, setFormData] = useState({ name: "", email: "" });
+    const [isPaymentSuccessful, setIsPaymentSuccessful] = useState(false);
 
     const handleIncreaseQuantity = (id) => {
         dispatch(increaseQuantity(id));
@@ -34,91 +41,202 @@ export default function Cart() {
         dispatch(removeFromCart(id));
     };
 
+    const handlePaymentFormSubmit = (values) => {
+        setFormData(values);
+        setIsPaymentSuccessful(true); // Simulate successful payment
+        setIsPaymentModalOpen(false);
+        setIsInvoiceModalOpen(true); // Open invoice modal after payment
+    };
+
+    const handlePaymentCancel = () => {
+        setIsPaymentModalOpen(false);
+    };
+
+    const handleInvoiceCancel = () => {
+        setIsInvoiceModalOpen(false);
+    };
+
     return (
-        <Card
-            title={<Title level={4}>Current Order</Title>}
-            style={{ width: "100%", maxWidth: 400 }}
-        >
-            <div className="space-y-4">
-                {cartItems.map((item) => (
-                    <div key={item.id} className="flex items-start space-x-4">
-                        <img
-                            src={item.image || "/placeholder.svg"}
-                            alt={item.name}
-                            className="h-16 w-16 rounded-md object-cover"
-                        />
-                        <div className="flex-1 space-y-1">
-                            <Text strong>{item.name}</Text>
-                            <div className="flex items-center justify-between">
-                                <Text type="warning">
-                                    ${item.price.toFixed(2)}
+        <>
+            <Card
+                className="cart-card"
+                title={
+                    <Title level={2} style={{ textAlign: "center" }}>
+                        Current Order
+                    </Title>
+                }
+            >
+                <div className="space-y-4">
+                    {cartItems.map((item) => (
+                        <div
+                            key={item.id}
+                            className="cart-item"
+                            style={{ marginBottom: "10px" }}
+                        >
+                            <img
+                                src={item.imageUrl}
+                                alt={item.name}
+                                className="cart-item-img"
+                            />
+                            <div className="cart-item-details">
+                                <Text className="cart-item-text">
+                                    {item.name}
                                 </Text>
-                                <div className="flex items-center space-x-2">
-                                    <Button
-                                        icon={<MinusOutlined />}
-                                        onClick={() =>
-                                            handleDecreaseQuantity(item.id)
-                                        }
-                                        disabled={item.quantity <= 1}
-                                        size="small"
-                                    />
-                                    <Text>{item.quantity}</Text>
-                                    <Button
-                                        icon={<PlusOutlined />}
-                                        onClick={() =>
-                                            handleIncreaseQuantity(item.id)
-                                        }
-                                        size="small"
-                                    />
-                                    <Button
-                                        icon={<DeleteOutlined />}
-                                        onClick={() =>
-                                            handleRemoveItem(item.id)
-                                        }
-                                        size="small"
-                                        danger
-                                    />
+                                <div className="flex items-center justify-between">
+                                    <Text className="cart-item-price">
+                                        ₹{item.price.toFixed(2)}
+                                    </Text>
+                                    <div className="cart-item-actions">
+                                        <Button
+                                            icon={<MinusOutlined />}
+                                            onClick={() =>
+                                                handleDecreaseQuantity(item.id)
+                                            }
+                                            disabled={item.quantity <= 1}
+                                            size="small"
+                                        />
+                                        <Text>{item.quantity}</Text>
+                                        <Button
+                                            icon={<PlusOutlined />}
+                                            onClick={() =>
+                                                handleIncreaseQuantity(item.id)
+                                            }
+                                            size="small"
+                                        />
+                                        <Button
+                                            icon={<DeleteOutlined />}
+                                            onClick={() =>
+                                                handleRemoveItem(item.id)
+                                            }
+                                            size="small"
+                                            danger
+                                        />
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                ))}
+                    ))}
 
-                <Divider />
+                    <Divider />
 
-                <div className="space-y-2">
-                    <div className="flex justify-between">
-                        <Text>Subtotal</Text>
-                        <Text>${subtotal.toFixed(2)}</Text>
+                    <div className="cart-summary">
+                        <div className="cart-summary-line">
+                            <Text>Subtotal</Text>
+                            <Text>₹{subtotal.toFixed(2)}</Text>
+                        </div>
+                        <div className="cart-summary-line secondary">
+                            <Text>Discount sales</Text>
+                            <Text>-₹{discount.toFixed(2)}</Text>
+                        </div>
+                        <div className="cart-summary-line secondary">
+                            <Text>Total sales tax</Text>
+                            <Text>₹{tax.toFixed(2)}</Text>
+                        </div>
                     </div>
-                    <div className="flex justify-between">
-                        <Text type="secondary">Discount sales</Text>
-                        <Text type="secondary">-${discount.toFixed(2)}</Text>
+
+                    <Divider />
+
+                    <div className="cart-total">
+                        <Text>Total &nbsp;</Text>
+                        <Text>₹{total.toFixed(2)}</Text>
                     </div>
-                    <div className="flex justify-between">
-                        <Text type="secondary">Total sales tax</Text>
-                        <Text type="secondary">${tax.toFixed(2)}</Text>
+
+                    <Button
+                        className="cart-payment-button"
+                        type="primary"
+                        onClick={() => setIsPaymentModalOpen(true)}
+                        disabled={cartItems.length === 0} // Disable button if cart is empty
+                    >
+                        Continue To Payment
+                    </Button>
+                </div>
+            </Card>
+
+            {/* Payment Modal */}
+            <Modal
+                title="Payment Details"
+                open={isPaymentModalOpen} // Use 'open' instead of 'visible'
+                onCancel={handlePaymentCancel}
+                footer={null}
+                width={400}
+            >
+                <Form onFinish={handlePaymentFormSubmit}>
+                    <Form.Item
+                        label="Name"
+                        name="name"
+                        rules={[
+                            {
+                                required: true,
+                                message: "Please input your name!",
+                            },
+                        ]}
+                    >
+                        <Input />
+                    </Form.Item>
+                    <Form.Item
+                        label="Email"
+                        name="email"
+                        rules={[
+                            {
+                                required: true,
+                                message: "Please input your email!",
+                            },
+                        ]}
+                    >
+                        <Input />
+                    </Form.Item>
+                    <Form.Item>
+                        <Button
+                            type="primary"
+                            htmlType="submit"
+                            style={{ width: "100%" }}
+                        >
+                            Submit Payment
+                        </Button>
+                    </Form.Item>
+                </Form>
+            </Modal>
+
+            {/* Invoice Modal */}
+            <Modal
+                title="Invoice"
+                open={isInvoiceModalOpen} // Use 'open' instead of 'visible'
+                onCancel={handleInvoiceCancel}
+                footer={null}
+                width={400}
+            >
+                <div>
+                    <Text strong>Name: {formData.name}</Text>
+                    <br />
+                    <Text strong>Email: {formData.email}</Text>
+                    <Divider />
+                    <Text strong>Invoice Details</Text>
+                    <div className="cart-summary">
+                        <div className="cart-summary-line">
+                            <Text>Subtotal</Text>
+                            <Text>₹{subtotal.toFixed(2)}</Text>
+                        </div>
+                        <div className="cart-summary-line secondary">
+                            <Text>Discount sales</Text>
+                            <Text>-₹{discount.toFixed(2)}</Text>
+                        </div>
+                        <div className="cart-summary-line secondary">
+                            <Text>Total sales tax</Text>
+                            <Text>₹{tax.toFixed(2)}</Text>
+                        </div>
+                    </div>
+
+                    <Divider />
+                    <div className="cart-total">
+                        <Text>Total: </Text>
+                        <Text>₹{total.toFixed(2)}</Text>
+                    </div>
+                    <div>
+                        <Text strong>Status: </Text>
+                        <Text type="success">Payment Successful</Text>
                     </div>
                 </div>
-
-                <Divider />
-
-                <div className="flex justify-between">
-                    <Text strong>Total</Text>
-                    <Text strong>${total.toFixed(2)}</Text>
-                </div>
-
-                <Button
-                    type="primary"
-                    style={{
-                        width: "100%",
-                        marginTop: "16px",
-                        backgroundColor: "#f5a623",
-                    }}
-                >
-                    Continue to Payment
-                </Button>
-            </div>
-        </Card>
+            </Modal>
+        </>
     );
 }

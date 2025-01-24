@@ -1,11 +1,11 @@
-import { Layout, Typography, Avatar, Dropdown, Button, message } from "antd";
-import { DownOutlined, MenuOutlined } from "@ant-design/icons";
+import { Layout, Typography, Avatar, Dropdown, Button } from "antd";
+import { MenuOutlined } from "@ant-design/icons";
 import { profilePhoto } from "../utils/imageUtils";
 
 const { Title } = Typography;
 const { Header } = Layout;
 
-const HeaderComponent = ({ onMenuClick, isMobileWidth, headerText }) => {
+const HeaderComponent = ({ isMobileWidth, headerText, toggleSidebar }) => {
     const menuItems = [
         {
             key: "profile",
@@ -40,21 +40,21 @@ const HeaderComponent = ({ onMenuClick, isMobileWidth, headerText }) => {
                     flex: 1,
                 }}
             >
-                {isMobileWidth && (
+                {isMobileWidth ? (
                     <Button
                         type="text"
                         icon={<MenuOutlined />}
-                        // onClick={onMenuClick}
+                        onClick={toggleSidebar} // This triggers sidebar toggle
                         style={{
                             fontSize: "18px",
                             padding: 0,
                         }}
                     />
-                )}
-                {!isMobileWidth && (
+                ) : (
                     <Title
                         level={2}
                         style={{
+                            marginBottom: 0,
                             paddingLeft: 16,
                         }}
                     >

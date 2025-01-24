@@ -1,20 +1,19 @@
 import React, { useState, useEffect } from "react";
-import { useSelector, useDispatch } from "react-redux";
+import { useDispatch } from "react-redux";
 import { Layout, Row, Col } from "antd";
-import { MenuUnfoldOutlined, MenuFoldOutlined } from "@ant-design/icons";
 import HeaderComponent from "../components/HeaderComponent";
 import SideBar from "../components/SideBar";
 import ServiceList from "../components/ServiceList";
 import Cart from "../components/Cart";
 import { addToCart } from "../hooks/cartReducer";
 
-const { Header, Content, Sider } = Layout;
+const { Content } = Layout;
 
 const Home = () => {
     const dispatch = useDispatch();
-    const cartItems = useSelector((state) => state.cart.cartItems);
-    const [isMobileWidth, setIsMobileWidth] = useState(false);
-    const [isTabletWidth, setIsTabletWidth] = useState(false);
+	const [isMobileWidth, setIsMobileWidth] = useState(false);
+  const [isTabletWidth, setIsTabletWidth] = useState(false);
+	
     const [sidebarVisible, setSidebarVisible] = useState(true);
 
     useEffect(() => {
@@ -34,70 +33,45 @@ const Home = () => {
     const toggleSidebar = () => {
         setSidebarVisible(!sidebarVisible);
     };
+    function checkMargin() {
+        if (isMobileWidth) return 0;
+        if (sidebarVisible && isTabletWidth) {
+            return 80;
+        }
+        return 240;
+    }
 
     const handleAddToCart = (service) => {
         dispatch(addToCart(service));
     };
 
     return (
-        <Layout style={{ minHeight: "100vh" }}>
-            <Sider
-                trigger={null}
-                collapsible
-                collapsed={!sidebarVisible}
-                breakpoint="lg"
-                collapsedWidth={0}
-                onBreakpoint={(broken) => {
-                    if (broken) {
-                        setSidebarVisible(false);
-                    }
-                }}
-                style={{
-                    overflow: "auto",
-                    height: "100vh",
-                    position: "fixed",
-                    left: 0,
-                    zIndex: 2,
-                }}
-            >
-                <SideBar />
-            </Sider>
+        <Layout>
+            <SideBar
+                visible={sidebarVisible}
+                tabletVisible={isTabletWidth}
+                onClose={() => setSidebarVisible(false)}
+                isMobileWidth={isMobileWidth}
+            />
             <Layout
                 style={{
-                    marginLeft: sidebarVisible ? 200 : 0,
-                    transition: "margin 0.2s",
+                    marginLeft: checkMargin(),
+                    transition: "margin-left 0.3s ease",
+                    minHeight: "100vh",
                 }}
             >
-                <Header style={{ padding: 0, background: "#fff" }}>
-                    <Row justify="space-between" align="middle">
-                        <Col>
-                            {React.createElement(
-                                sidebarVisible
-                                    ? MenuFoldOutlined
-                                    : MenuUnfoldOutlined,
-                                {
-                                    className: "trigger",
-                                    onClick: toggleSidebar,
-                                    style: {
-                                        fontSize: "18px",
-                                        padding: "0 24px",
-                                        cursor: "pointer",
-                                    },
-                                }
-                            )}
-                        </Col>
-                        <Col>
-                            <HeaderComponent isMobileWidth={isMobileWidth} />
-                        </Col>
-                    </Row>
-                </Header>
+                <HeaderComponent
+                    onMenuClick={toggleSidebar}
+                    isMobileWidth={isMobileWidth}
+                    headerText="Dashboard"
+                />
+
                 <Content style={{ margin: "24px 16px", overflow: "initial" }}>
                     <Row gutter={[24, 24]}>
                         <Col xs={24} lg={16}>
                             <ServiceList
                                 addToCart={handleAddToCart}
                                 isMobileWidth={isMobileWidth}
-                                isTabletWidth={isTabletWidth}
                             />
                         </Col>
                         <Col xs={24} lg={8}>

@@ -1,5 +1,6 @@
 .ant-layout-sider {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  background-color: #fafafa;
 }
 
 .ant-menu-item {
@@ -7,13 +8,30 @@
   margin: 4px 0 !important;
 }
 
+/* Mobile-specific styles */
 @media (max-width: 767px) {
   .ant-layout-sider {
-    transform: translateX(-100%);
-    transition: all 0.3s ease;
+    transform: translateX(-100%); /* Hide sidebar */
+    transition: transform 0.3s ease; /* Smooth transition for visibility toggle */
+    position: fixed; /* Ensure sidebar stays on top */
+    z-index: 1000; /* Prevent overlapping issues */
+  }
+
+  .ant-layout-sider.ant-layout-sider-collapsed {
+    transform: translateX(-100%); /* Hide when collapsed */
   }
 
   .ant-layout-sider:not(.ant-layout-sider-collapsed) {
-    transform: translateX(0);
+    transform: translateX(0); /* Show when expanded */
   }
+}
+
+/* Adjust menu item padding and hover styles for better UX */
+.ant-menu-item:hover {
+  background-color: #f0f0f0 !important;
+  transition: background-color 0.2s ease;
+}
+
+.ant-menu-item-selected {
+  background-color: #e6f7ff !important;
 }

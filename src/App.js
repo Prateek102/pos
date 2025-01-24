@@ -1,8 +1,6 @@
 import React from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Home from "./pages/Home";
-import Checkout from "./pages/Checkout";
-import Navbar from "./components/Navbar";
 
 const App = () => {
     return (
@@ -11,7 +9,6 @@ const App = () => {
                 <main className="flex-grow">
                     <Routes>
                         <Route path="/" element={<Home />} />
-                        <Route path="/checkout" element={<Checkout />} />
                     </Routes>
                 </main>
             </div>
